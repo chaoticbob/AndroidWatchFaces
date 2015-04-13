@@ -72,7 +72,7 @@ public class Texture {
 
     public Texture(Surface32f surface) {
         initialize();
-        texImage2D(surface)
+        texImage2D(surface);
     }
 
     private void initialize() {

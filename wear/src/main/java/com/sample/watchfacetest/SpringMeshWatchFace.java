@@ -89,8 +89,6 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             Log.i(TAG, "onGlSurfaceCreated");
             super.onGlSurfaceCreated(width, height);
 
-            Texture.nextBoundUnit();
-
             mScreenWidth = width;
             mScreenHeight = height;
 
