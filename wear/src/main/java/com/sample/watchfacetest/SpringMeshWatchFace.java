@@ -11,7 +11,6 @@ import android.view.SurfaceHolder;
 
 import org.hai.fx.SpringMesh;
 import org.hai.gl.GlslProg;
-import org.hai.gl.Texture;
 import org.hai.grfx.Camera;
 import org.hai.grfx.Rect;
 import org.hai.grfx.es2.TriMesh3D;
@@ -123,13 +122,16 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
 
         @Override
         public void onVisibilityChanged(boolean visible) {
+            Log.i(TAG, "onVisibilityChanged:" + visible);
             super.onVisibilityChanged(visible);
 
             if(visible) {
                 registerSensor();
+                invalidate();
             }
             else {
                 unregisterSensor();
+                mHasSample = false;
             }
         }
 
