@@ -152,8 +152,8 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
 
             mForcePoints[0] = mScreenWidth/2.0f + mOffsetX;
             mForcePoints[1] = mScreenHeight/2.0f + mOffsetY;
-            mSpringMesh.applyCircleForce(mForcePoints, 32.0f*mStrength, 50000.0f*mStrength);
-            mStrength *= 0.92f;
+            mSpringMesh.applyCircleForce(mForcePoints, 32.0f*mStrength, 25000.0f*mStrength);
+            mStrength *= 0.97f;
 
             mSpringMesh.update();
             mSpringMesh.draw(this.mCamera);
