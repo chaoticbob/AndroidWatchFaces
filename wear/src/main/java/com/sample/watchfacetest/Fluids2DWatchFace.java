@@ -190,12 +190,14 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-            mForcePoints[0].x = (mScreenWidth/2.0f + mOffsetX)/(float)mScreenWidth;
-            mForcePoints[0].y = (mScreenHeight/2.0f + mOffsetY)/(float)mScreenHeight;
-            mForcePoints[0].dx = (mOffsetX - mPrevOffsetX)/(float)mScreenWidth*mStrength;
-            mForcePoints[0].dy = (mOffsetY - mPrevOffsetY)/(float)mScreenHeight*mStrength;
-            mFluids2D.splatDensity(mForcePoints, mStrength);
-            mFluids2D.splatVelocity(mForcePoints, mStrength);
+            if(mStrength > 0.1f) {
+                mForcePoints[0].x = (mScreenWidth / 2.0f + mOffsetX) / (float)mScreenWidth;
+                mForcePoints[0].y = (mScreenHeight / 2.0f + mOffsetY) / (float)mScreenHeight;
+                mForcePoints[0].dx = (mOffsetX - mPrevOffsetX) / (float)mScreenWidth * mStrength;
+                mForcePoints[0].dy = (mOffsetY - mPrevOffsetY) / (float)mScreenHeight * mStrength;
+                mFluids2D.splatDensity(mForcePoints, mStrength);
+                mFluids2D.splatVelocity(mForcePoints, mStrength);
+            }
             mStrength *= 0.99f;
 
             mFluids2D.update();
