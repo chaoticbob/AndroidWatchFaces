@@ -24,6 +24,9 @@ Project files are Android Studio 1.1.
 ### Devices
 Samples were tested on a LG G watch. Haven't had a chance to run on emulator yet.
 
+### How Come the WatchFaces Don't Tell Time?!
+These samples are just a starting point for learning! I'll add time telling soon!
+
 ### License
 License is BSD/MIT/Boost. 
 
