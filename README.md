@@ -6,7 +6,7 @@ The OpenGL is ported from some existing WebGL code. Still in the process of fill
 
 ### Watch Faces
 - SpringMesh
-- Fluids2D (not finished)
+- Fluids2D
 - Particles (not finished)
 
 License is BSD/MIT/Boost. 
