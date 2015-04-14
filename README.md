@@ -1,6 +1,6 @@
 ## AndroidWatchFaces
 
-A conversation with someone got me curious about using OpenGL for Android Wear watchfaces, so I wrote a sample or two based on some graphics code kicking around. 
+A conversation with someone got me curious about using OpenGL for Android Wear watchfaces, so I wrote a sample or two using some graphics code I had laying around. 
 
 The OpenGL is ported from some existing WebGL code. JavaScript to Java?! I know right. Still in the process of filling out it. It's done enough right now to support the required functions on the watchfaces. 
 
