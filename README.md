@@ -6,9 +6,15 @@ The OpenGL is ported from some existing WebGL code. JavaScript to Java?! I know 
 
 ### Watch Faces
 ##### SpringMesh
-Spring mesh simulation. Responds to accelorometer.
+Spring mesh simulation. Responds to accelorometer. Looks similar to the screenshot below. Will get real screenshot soon. 
+
+![alt tag](https://raw.githubusercontent.com/chaoticbob/AndroidWatchFaces/master/images/springs.png)
+
 ##### Fluids2D
-2D fluids simulation. Responds to accelorometer.
+2D fluids simulation. Responds to accelorometer. Looks similar to the screenshot below. Will get real screenshot soon.
+
+![alt tag](https://raw.githubusercontent.com/chaoticbob/AndroidWatchFaces/master/images/fluids.png)
+
 ##### Particles
 (not finished)
 
