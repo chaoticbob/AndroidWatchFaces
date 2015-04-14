@@ -9,6 +9,10 @@ The OpenGL is ported from some existing WebGL code. JavaScript to Java?! I know 
 - Fluids2D - 2D fluids simulation. Responds to accelorometer.
 - Particles (not finished)
 
+### Building
+Project files are Android Studio 1.1. 
+
+### License
 License is BSD/MIT/Boost. 
 
 Have fun.
