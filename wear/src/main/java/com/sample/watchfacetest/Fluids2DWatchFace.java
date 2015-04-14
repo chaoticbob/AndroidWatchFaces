@@ -270,8 +270,14 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             float y = mAccel[1];
             float z = mAccel[2];
 
-            mOffsetTargetX =  (x/9.5f)*(mScreenWidth/2.0f);
-            mOffsetTargetY = -(y/9.5f)*(mScreenHeight/2.0f);
+            float hw = mScreenWidth/2.0f;
+            float hh = mScreenHeight/2.0f;
+            mOffsetTargetX =  (x/7.5f)*hw;
+            mOffsetTargetY = -(y/7.5f)*hh;
+            float ws = mOffsetTargetX < 0.0f ? -1.0f : 1.0f;
+            float hs = mOffsetTargetY < 0.0f ? -1.0f : 1.0f;
+            mOffsetTargetX = ws*Math.min(Math.abs(mOffsetTargetX), hw);
+            mOffsetTargetY = hs*Math.min(Math.abs(mOffsetTargetY), hh);
 
             if(mHasSample) {
                 float max = 7.5f;
