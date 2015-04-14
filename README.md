@@ -22,7 +22,7 @@ Spring mesh simulation. Responds to accelorometer. Looks similar to the screensh
 Project files are Android Studio 1.1. 
 
 ### Devices
-I tested these on an LG G watch. Haven't had a chance to run on emulator yet.
+Samples were tested on a LG G watch. Haven't had a chance to run on emulator yet.
 
 ### License
 License is BSD/MIT/Boost. 
