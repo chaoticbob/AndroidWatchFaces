@@ -177,8 +177,10 @@ public class Fluids2D {
             x = Math.max( 0.0f, Math.min( w, x ) );
             y = Math.max( 0.0f, Math.min( h, y ) );
 
-            int x0 = (int)Math.floor( x );
-            int y0 = (int)Math.floor( y );
+            //int x0 = (int)Math.floor( x );
+            //int y0 = (int)Math.floor( y );
+            int x0 = (int)x;
+            int y0 = (int)y;
             int x1 = x0 + 1;
             int y1 = y0 + 1;
 
@@ -218,8 +220,10 @@ public class Fluids2D {
             x = Math.max( 0.0f, Math.min( w, x ) );
             y = Math.max( 0.0f, Math.min( h, y ) );
 
-            int x0 = (int)Math.floor( x );
-            int y0 = (int)Math.floor( y );
+            //int x0 = (int)Math.floor( x );
+            //int y0 = (int)Math.floor( y );
+            int x0 = (int)x;
+            int y0 = (int)y;
             int x1 = x0 + 1;
             int y1 = y0 + 1;
 
@@ -339,8 +343,10 @@ public class Fluids2D {
                 jPrev = Math.max( yMin, Math.min( yMax, jPrev ) );
 
                 // Calculate bilinear values
-                int x0 = (int)Math.floor( iPrev );
-                int y0 = (int)Math.floor( jPrev );
+                //int x0 = (int)Math.floor( iPrev );
+                //int y0 = (int)Math.floor( jPrev );
+                int x0 = (int)iPrev;
+                int y0 = (int)jPrev;
                 int x1 = x0 + 1;
                 int y1 = y0 + 1;
                 float a1 = iPrev - x0;

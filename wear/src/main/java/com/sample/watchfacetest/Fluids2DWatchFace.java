@@ -126,8 +126,8 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
 
             mCamera = Camera.createPixelAlignedUL(mScreenWidth, mScreenHeight, 15.0f);
 
-            int nx = 64;
-            int ny = 64;
+            int nx = 96;
+            int ny = 96;
             Rect rect = new Rect(0, 0, mScreenWidth, mScreenHeight);
             mFluids2D = new Fluids2D(nx, ny, rect);
 
