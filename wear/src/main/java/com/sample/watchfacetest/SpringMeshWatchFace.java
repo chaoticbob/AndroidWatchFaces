@@ -11,13 +11,9 @@ import android.view.SurfaceHolder;
 
 import org.hai.fx.SpringMesh;
 import org.hai.gl.GlslProg;
-import org.hai.gl.Texture;
 import org.hai.grfx.Camera;
 import org.hai.grfx.Rect;
-import org.hai.grfx.Surface32f;
-import org.hai.grfx.Surface8u;
 import org.hai.grfx.es2.TriMesh3D;
-import org.hai.math.vec3;
 
 public class SpringMeshWatchFace extends Gles2WatchFaceService {
     private static final String TAG = "SpringMeshWatchFace";
@@ -47,17 +43,10 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
         private float mStrength = 0.0f;
         private float[] mForcePoints = {0.0f, 0,0f};
 
-        private TriMesh3D mTestRectMesh = null;
-        private GlslProg mTestDrawTexShader = null;
-        private Texture mTestTex = null;
-
         @Override
         public void onCreate(SurfaceHolder holder) {
             Log.i(TAG, "onCreate");
             super.onCreate(holder);
-
-            vec3 v = new vec3(1, 2, 3);
-            Log.i(TAG, "v=" + v.toString());
         }
 
         @Override
@@ -88,36 +77,6 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             catch(Exception e) {
                 Log.e(TAG, "mColorShader failed: " + e.toString());
             }
-
-            try {
-                String vertShaderSrc =
-                    "attribute vec4 vPosition;" + "\n" +
-                    "attribute vec2 vTexCoord;" + "\n" +
-                    "uniform mat4 mvp;" + "\n" +
-                    "uniform mat4 xform;" + "\n" +
-                    "varying vec2 uv;" + "\n" +
-                    "void main() {" + "\n" +
-                    "   gl_Position = mvp*xform*vPosition;" + "\n" +
-                    "   uv = vTexCoord;" + "\n" +
-                    "}";
-
-                String fragShaderSrc =
-                    "precision mediump float;" + "\n" +
-                    "uniform sampler2D tex0;" + "\n" +
-                    "varying vec2 uv;" + "\n" +
-                    "void main() {" + "\n" +
-                    "    gl_FragColor = texture2D(tex0, uv);" + "\n" +
-                    "}";
-
-                mTestDrawTexShader = GlslProg.create(vertShaderSrc, fragShaderSrc);
-                Log.i(TAG, "mTestDrawTexShader successful");
-            }
-            catch(Exception e) {
-                Log.e(TAG, "mColorShader failed: " + e.toString());
-            }
-
-            mTestTex = new Texture( Surface8u.createTestPattern() );
-
         }
 
         @Override
@@ -139,9 +98,6 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             mRectMesh = TriMesh3D.createRectUL(0, 0, 16, 16);
             mRectMesh.setShader(mColorShader);
             mRectMesh.getTransform().setOriginOffset(-8.0f, -8.0f, 0.0f);
-
-            mTestRectMesh = TriMesh3D.createRectUL(0, 0, 256, 256);
-            mTestRectMesh.setShader(mTestDrawTexShader);
         }
 
         @Override
@@ -208,12 +164,6 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             mRectMesh.getShader().uniform("color", 0.0f, 0.0f, 1.0f);
             mRectMesh.draw(this.mCamera);
             mRectMesh.drawEnd();
-
-            mTestRectMesh.drawBegin();
-            mTestRectMesh.getShader().uniform("xform", mTestRectMesh.getTransform().getMatrix());
-            mTestRectMesh.getShader().uniform("tex0", mTestTex);
-            mTestRectMesh.draw(this.mCamera);
-            mTestRectMesh.drawEnd();
         }
 
         @Override
@@ -263,7 +213,7 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
                     mStrength = 1.0f;
                 }
 
-                mPrevSampleX = mOffsetTargetY;
+                mPrevSampleX = mOffsetTargetX;
                 mPrevSampleY = mOffsetTargetY;
             }
             else {

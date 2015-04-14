@@ -1,5 +1,6 @@
 package org.hai.fx;
 
+import org.hai.grfx.Camera;
 import org.hai.grfx.Rect;
 
 public class Fluids2D {
@@ -10,12 +11,14 @@ public class Fluids2D {
         public float dx;
         public float dy;
 
-        Force(float x, float y, float dx, float dy) {
-            this.x = x;
-            this.y = y;
-            this.dx = dx;
-            this.dy = dy;
-        }
+        public Force() {}
+
+//        Force(float x, float y, float dx, float dy) {
+//            this.x = x;
+//            this.y = y;
+//            this.dx = dx;
+//            this.dy = dy;
+//        }
     }
 
     private int resX                = 0;
@@ -134,15 +137,33 @@ public class Fluids2D {
         }
     }
 
+    public float[] getDensity() {
+        return this.den1;
+    }
+
+
     class SplatPoints {
         int x;
         int y;
         float s;
+
+        public SplatPoints() {}
     }
 
-    static SplatPoints[] sPoints = new SplatPoints[4];
+    static SplatPoints[] sPoints = null;
 
-    public void splatVelocity(Force[] forces) {
+    private void allocateSplatPoints() {
+        if(null == sPoints) {
+            sPoints = new SplatPoints[4];
+            for(int i = 0; i < sPoints.length; ++i) {
+                sPoints[i] = new SplatPoints();
+            }
+        }
+    }
+
+    public void splatVelocity(Force[] forces, float strength) {
+        allocateSplatPoints();
+
         for( int i = 0; i < forces.length; ++i ) {
             Force f = forces[i];
 
@@ -171,7 +192,7 @@ public class Fluids2D {
             sPoints[2].x = x0; sPoints[2].y = y1; sPoints[2].s = a0*b1;
             sPoints[3].x = x1; sPoints[3].y = y1; sPoints[3].s = a1*b1;
 
-            float scale = 250.0f;
+            float scale = 250.0f*strength;
             for(int k = 0; k < sPoints.length; ++k) {
                 SplatPoints p = sPoints[k];
                 int idx = p.y*this.resX + p.x;
@@ -183,7 +204,9 @@ public class Fluids2D {
         }
     }
 
-    public void splatDensity(Force[] forces) {
+    public void splatDensity(Force[] forces, float strength) {
+        allocateSplatPoints();
+
         for( int i = 0; i < forces.length; ++i ) {
             Force f = forces[i];
 
@@ -192,8 +215,6 @@ public class Fluids2D {
 
             float x = f.x*w;
             float y = f.y*h;
-            float dx = f.dx*w;
-            float dy = f.dy*h;
             x = Math.max( 0.0f, Math.min( w, x ) );
             y = Math.max( 0.0f, Math.min( h, y ) );
 
@@ -212,7 +233,7 @@ public class Fluids2D {
             sPoints[2].x = x0; sPoints[2].y = y1; sPoints[2].s = a0*b1;
             sPoints[3].x = x1; sPoints[3].y = y1; sPoints[3].s = a1*b1;
 
-            float scale = 25.0f;
+            float scale = 32.0f*strength;
             for(int k = 0; k < sPoints.length; ++k) {
                 SplatPoints p = sPoints[k];
                 int idx = p.y*this.resX + p.x;
