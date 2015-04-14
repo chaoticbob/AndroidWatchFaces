@@ -127,14 +127,25 @@ public class Texture {
             return;
         }
 
+        mWidth = surface.getWidth();
+        mHeight = surface.getHeight();
+
+        switch(surface.getFormat()) {
+            case R    : mFormat = GLES20.GL_LUMINANCE;       break;
+            case RG   : mFormat = GLES20.GL_LUMINANCE_ALPHA; break;
+            case RGB  : mFormat = GLES20.GL_RGB;             break;
+            case RGBA : mFormat = GLES20.GL_RGBA;            break;
+        }
+
         int target = GLES20.GL_TEXTURE_2D;
         int level = 0;
-        int internalFormat = GLES20.GL_RGB;
-        int width = surface.getWidth();
-        int height = surface.getHeight();
+        int internalFormat = mFormat;
+        int width = mWidth;
+        int height = mHeight;
         int border = 0;
-        int format = GLES20.GL_RGB;
+        int format = mFormat;
         int type = GLES20.GL_UNSIGNED_BYTE;
+
 
         ByteBuffer buffer = ByteBuffer.allocateDirect(surface.getDataSizeInBytes());
         buffer.order(ByteOrder.nativeOrder());
@@ -151,14 +162,50 @@ public class Texture {
             return;
         }
 
+        mWidth = surface.getWidth();
+        mHeight = surface.getHeight();
+
+        switch(surface.getFormat()) {
+            case R    : mFormat = GLES20.GL_LUMINANCE;       break;
+            case RG   : mFormat = GLES20.GL_LUMINANCE_ALPHA; break;
+            case RGB  : mFormat = GLES20.GL_RGB;             break;
+            case RGBA : mFormat = GLES20.GL_RGBA;            break;
+        }
+
         int target = GLES20.GL_TEXTURE_2D;
         int level = 0;
-        int internalFormat = GLES20.GL_RGB;
-        int width = surface.getWidth();
-        int height = surface.getHeight();
+        int internalFormat = mFormat;
+        int width = mWidth;
+        int height = mHeight;
         int border = 0;
-        int format = GLES20.GL_RGB;
-        int type = GLES20.GL_UNSIGNED_BYTE;
+        int format = mFormat;
+        int type = GLES20.GL_FLOAT;
+
+        switch(surface.getFormat()) {
+            case R: {
+                internalFormat = GLES20.GL_LUMINANCE;
+                format = GLES20.GL_LUMINANCE;
+            }
+            break;
+
+            case RG: {
+                internalFormat = GLES20.GL_LUMINANCE_ALPHA;
+                format = GLES20.GL_LUMINANCE_ALPHA;
+            }
+            break;
+
+            case RGB: {
+                internalFormat = GLES20.GL_RGB;
+                format = GLES20.GL_RGB;
+            }
+            break;
+
+            case RGBA: {
+                internalFormat = GLES20.GL_RGBA;
+                format = GLES20.GL_RGBA;
+            }
+            break;
+        }
 
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(surface.getDataSizeInBytes());
         byteBuffer.order(ByteOrder.nativeOrder());

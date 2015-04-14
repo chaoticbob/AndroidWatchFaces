@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.hai.math.mat4;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GlslProg {
@@ -15,6 +16,8 @@ public class GlslProg {
 
     private HashMap<String, Integer> mAttributeLocations = new HashMap<>();
     private HashMap<String, Integer> mUniformLocations = new HashMap<>();
+
+    private ArrayList<Texture> mBoundTextures = new ArrayList<>();
 
     /** GlslProg
      *
@@ -177,7 +180,19 @@ public class GlslProg {
      *
      */
     public void unbind() {
+        unbindTextures();
         GLES20.glUseProgram(0);
+    }
+
+    /** unbindTextures
+     *
+     */
+    public void unbindTextures() {
+        for(int i = 0; i < mBoundTextures.size(); ++i) {
+            Texture tex = mBoundTextures.get(i);
+            tex.unbind();
+        }
+        mBoundTextures.clear();
     }
 
     /** uniform
@@ -234,9 +249,24 @@ public class GlslProg {
      *
      * @param name Uniform name
      * @param mat Matrix
+     *
      */
     public void uniform(String name, mat4 mat) {
         int location = mUniformLocations.get(name);
         GLES20.glUniformMatrix4fv(location, 1, false, mat.m, 0);
+    }
+
+    /**
+     * @param name Uniform name
+     * @param tex Texture
+     *
+     */
+    public void uniform(String name, Texture tex) {
+        int location = mUniformLocations.get(name);
+        int texUnit = tex.bind();
+        if(-1 != texUnit) {
+            GLES20.glUniform1i(location, texUnit);
+            mBoundTextures.add(tex);
+        }
     }
 }

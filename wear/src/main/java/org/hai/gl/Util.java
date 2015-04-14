@@ -5,7 +5,11 @@ import android.opengl.GLException;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
 
+import java.util.Arrays;
+
 public class Util {
+    private static String[] sExtenions = null;
+
     public static void checkGlError(String glOp) {
         int error = GLES20.glGetError();
         if(GLES20.GL_NO_ERROR != error) {
@@ -28,5 +32,16 @@ public class Util {
             result = "FRAGMENT SHADER";
         }
         return result;
+    }
+
+    public static String[] getExtensions() {
+        if(null == sExtenions) {
+            sExtenions = GLES20.glGetString(GLES20.GL_EXTENSIONS).split("\\s");
+        }
+        return sExtenions;
+    }
+
+    public static boolean supportsExtension(String ext) {
+        return Arrays.asList(sExtenions).contains(ext);
     }
 }

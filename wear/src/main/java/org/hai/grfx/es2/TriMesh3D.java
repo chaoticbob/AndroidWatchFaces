@@ -3,6 +3,7 @@ package org.hai.grfx.es2;
 import android.opengl.GLES20;
 
 import org.hai.grfx.Camera;
+import org.hai.math.vec2;
 import org.hai.math.vec3;
 
 public class TriMesh3D extends Mesh3D {
@@ -30,6 +31,10 @@ public class TriMesh3D extends Mesh3D {
         vec3 P1 = new vec3(x, y - height, 0.0f);
         vec3 P2 = new vec3(x + width, y - height, 0.0f);
         vec3 P3 = new vec3(x + width, y, 0.0f);
+        vec2 uv0 = new vec2(0, 1);
+        vec2 uv1 = new vec2(0, 0);
+        vec2 uv2 = new vec2(1, 0);
+        vec2 uv3 = new vec2(1, 1);
 
         float[] positions = new float[3*4];
         positions[0*3 + 0] = P0.x();
@@ -45,10 +50,21 @@ public class TriMesh3D extends Mesh3D {
         positions[3*3 + 1] = P3.y();
         positions[3*3 + 2] = P3.z();
 
+        float[] uvs = new float[2*4];
+        uvs[0*2 + 0] = uv0.x();
+        uvs[0*2 + 1] = uv0.y();
+        uvs[1*2 + 0] = uv1.x();
+        uvs[1*2 + 1] = uv1.y();
+        uvs[2*2 + 0] = uv2.x();
+        uvs[2*2 + 1] = uv2.y();
+        uvs[3*2 + 0] = uv3.x();
+        uvs[3*2 + 1] = uv3.y();
+
         int[] indices = { 0, 1, 2, 0, 2, 3 };
 
         result.bufferIndices(indices);
         result.bufferPositions(positions);
+        result.bufferTexCoords(uvs);
 
         return result;
     }
@@ -60,6 +76,10 @@ public class TriMesh3D extends Mesh3D {
         vec3 P1 = new vec3(x, y + height, 0.0f);
         vec3 P2 = new vec3(x + width, y + height, 0.0f);
         vec3 P3 = new vec3(x + width, y, 0.0f);
+        vec2 uv0 = new vec2(0, 0);
+        vec2 uv1 = new vec2(0, 1);
+        vec2 uv2 = new vec2(1, 1);
+        vec2 uv3 = new vec2(1, 0);
 
         float[] positions = new float[3*4];
         positions[0*3 + 0] = P0.x();
@@ -75,10 +95,21 @@ public class TriMesh3D extends Mesh3D {
         positions[3*3 + 1] = P3.y();
         positions[3*3 + 2] = P3.z();
 
+        float[] uvs = new float[2*4];
+        uvs[0*2 + 0] = uv0.x();
+        uvs[0*2 + 1] = uv0.y();
+        uvs[1*2 + 0] = uv1.x();
+        uvs[1*2 + 1] = uv1.y();
+        uvs[2*2 + 0] = uv2.x();
+        uvs[2*2 + 1] = uv2.y();
+        uvs[3*2 + 0] = uv3.x();
+        uvs[3*2 + 1] = uv3.y();
+
         int[] indices = { 0, 1, 2, 0, 2, 3 };
 
         result.bufferIndices(indices);
         result.bufferPositions(positions);
+        result.bufferTexCoords(uvs);
 
         return result;
     }
