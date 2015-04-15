@@ -1,13 +1,18 @@
 package com.sample.watchfacetest;
 
+import android.graphics.PixelFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.opengl.GLES20;
+import android.support.v4.view.MotionEventCompat;
 import android.support.wearable.watchface.Gles2WatchFaceService;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.View;
+import android.view.WindowManager;
 
 import org.hai.fx.Fluids2D;
 import org.hai.gl.GlslProg;
@@ -22,7 +27,7 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
 
     private static final String TAG = "Fluids2DWatchFace";
 
-    private class MyEngine extends Gles2WatchFaceService.Engine implements SensorEventListener {
+    private class MyEngine extends Gles2WatchFaceService.Engine implements SensorEventListener, View.OnTouchListener {
 
         private SensorManager mSensorMananger = null;
         private float[] mAccel = null;
@@ -52,6 +57,9 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
         private float mPrevOffsetY = 0.0f;
         private float mStrength = 0.0f;
         private Fluids2D.Force[] mForcePoints = new Fluids2D.Force[1];
+
+        private InteractiveTouchView mInteractiveTouchView = null;
+        private float mTouchAreaScreenFraction = 0.25f;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -160,6 +168,55 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             mSensorMananger.unregisterListener(this);
         }
 
+        private void setupTouch() {
+            if(mInteractiveTouchView != null) {
+                return;
+            }
+
+            mInteractiveTouchView = new InteractiveTouchView(getApplicationContext());
+            mInteractiveTouchView.setOnTouchListener(this);
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                    (int)(mScreenWidth * mTouchAreaScreenFraction),
+                    (int)(mScreenHeight * mTouchAreaScreenFraction),
+                    WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                    PixelFormat.TRANSLUCENT);
+
+            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+            wm.addView(mInteractiveTouchView, params);
+        }
+
+        private void teardownTouch() {
+            if(mInteractiveTouchView == null) {
+                return; // Nothing to remove
+            }
+
+            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+            wm.removeView(mInteractiveTouchView);
+            mInteractiveTouchView = null;
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            int action = MotionEventCompat.getActionMasked(event);
+            switch(action) {
+                case (MotionEvent.ACTION_DOWN) :
+                    updatePositions(event);
+                case (MotionEvent.ACTION_MOVE) :
+                    updatePositions(event);
+                case (MotionEvent.ACTION_UP) :
+                    updatePositions(event);
+                default :
+                    break;
+            }
+            return true;
+        }
+
+        private void updatePositions(MotionEvent event) {
+            mOffsetX = event.getRawX();
+            mOffsetY = event.getRawY();
+        }
+
         @Override
         public void onVisibilityChanged(boolean visible) {
             Log.i(TAG, "onVisibilityChanged:" + visible);
@@ -167,10 +224,12 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
 
             if(visible) {
                 registerSensor();
+                setupTouch();
                 invalidate();
             }
             else {
                 unregisterSensor();
+                teardownTouch();
                 mHasSample = false;
             }
         }
@@ -190,9 +249,12 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
+//            float currentTouchStrength = getTouchStrength();
+            mStrength = 1f;
+
             if(mStrength > 0.1f) {
-                mForcePoints[0].x = (mScreenWidth / 2.0f + mOffsetX) / (float)mScreenWidth;
-                mForcePoints[0].y = (mScreenHeight / 2.0f + mOffsetY) / (float)mScreenHeight;
+                mForcePoints[0].x = mOffsetX / (float)mScreenWidth;
+                mForcePoints[0].y = mOffsetY / (float)mScreenHeight;
                 mForcePoints[0].dx = (mOffsetX - mPrevOffsetX) / (float)mScreenWidth * mStrength;
                 mForcePoints[0].dy = (mOffsetY - mPrevOffsetY) / (float)mScreenHeight * mStrength;
                 mFluids2D.splatDensity(mForcePoints, mStrength);
@@ -224,10 +286,7 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             mPrevOffsetX = mOffsetX;
             mPrevOffsetY = mOffsetY;
 
-            float a = 0.08f;
-            mOffsetX += a*(mOffsetTargetX - mOffsetX);
-            mOffsetY += a*(mOffsetTargetY - mOffsetY);
-            mRectMesh.getTransform().setTranslate(mScreenWidth/2.0f + mOffsetX, mScreenHeight/2.0f + mOffsetY, 0.0f);
+            mRectMesh.getTransform().setTranslate(mOffsetX, mOffsetY, 0.0f);
 
             mRectMesh.drawBegin();
             mRectMesh.getShader().uniform("xform", mRectMesh.getTransform().getMatrix());
