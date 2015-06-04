@@ -27,7 +27,8 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
 
     private static final String TAG = "Fluids2DWatchFace";
 
-    private class MyEngine extends Gles2WatchFaceService.Engine implements SensorEventListener, View.OnTouchListener {
+    //private class MyEngine extends Gles2WatchFaceService.Engine implements SensorEventListener, View.OnTouchListener {
+    private class MyEngine extends Gles2WatchFaceService.Engine implements SensorEventListener {
 
         private SensorManager mSensorMananger = null;
         private float[] mAccel = null;
@@ -168,6 +169,7 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             mSensorMananger.unregisterListener(this);
         }
 
+        /*
         private void setupTouch() {
             if(mInteractiveTouchView != null) {
                 return;
@@ -216,6 +218,7 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             mOffsetX = event.getRawX();
             mOffsetY = event.getRawY();
         }
+        */
 
         @Override
         public void onVisibilityChanged(boolean visible) {
@@ -224,12 +227,12 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
 
             if(visible) {
                 registerSensor();
-                setupTouch();
+                //setupTouch();
                 invalidate();
             }
             else {
                 unregisterSensor();
-                teardownTouch();
+                //teardownTouch();
                 mHasSample = false;
             }
         }
@@ -249,12 +252,20 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-//            float currentTouchStrength = getTouchStrength();
-            mStrength = 1f;
+            //float currentTouchStrength = getTouchStrength();
+            //mStrength = 1.0f;
 
             if(mStrength > 0.1f) {
+                /*
                 mForcePoints[0].x = mOffsetX / (float)mScreenWidth;
                 mForcePoints[0].y = mOffsetY / (float)mScreenHeight;
+                mForcePoints[0].dx = (mOffsetX - mPrevOffsetX) / (float)mScreenWidth * mStrength;
+                mForcePoints[0].dy = (mOffsetY - mPrevOffsetY) / (float)mScreenHeight * mStrength;
+                mFluids2D.splatDensity(mForcePoints, mStrength);
+                mFluids2D.splatVelocity(mForcePoints, mStrength);
+                */
+                mForcePoints[0].x = (mScreenWidth / 2.0f + mOffsetX) / (float)mScreenWidth;
+                mForcePoints[0].y = (mScreenHeight / 2.0f + mOffsetY) / (float)mScreenHeight;
                 mForcePoints[0].dx = (mOffsetX - mPrevOffsetX) / (float)mScreenWidth * mStrength;
                 mForcePoints[0].dy = (mOffsetY - mPrevOffsetY) / (float)mScreenHeight * mStrength;
                 mFluids2D.splatDensity(mForcePoints, mStrength);
@@ -286,7 +297,11 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             mPrevOffsetX = mOffsetX;
             mPrevOffsetY = mOffsetY;
 
-            mRectMesh.getTransform().setTranslate(mOffsetX, mOffsetY, 0.0f);
+            float a = 0.08f;
+            mOffsetX += a*(mOffsetTargetX - mOffsetX);
+            mOffsetY += a*(mOffsetTargetY - mOffsetY);
+            mRectMesh.getTransform().setTranslate(mScreenWidth/2.0f + mOffsetX, mScreenHeight/2.0f + mOffsetY, 0.0f);
+            //mRectMesh.getTransform().setTranslate(mOffsetX, mOffsetY, 0.0f);
 
             mRectMesh.drawBegin();
             mRectMesh.getShader().uniform("xform", mRectMesh.getTransform().getMatrix());
