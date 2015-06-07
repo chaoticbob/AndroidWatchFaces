@@ -1,5 +1,11 @@
 package org.hai.grfx;
 
+import android.graphics.Bitmap;
+import android.util.Log;
+
+import java.nio.ByteBuffer;
+import java.text.Normalizer;
+
 public class Surface8u extends Surface {
 
     private byte[] mData = null;
@@ -24,6 +30,13 @@ public class Surface8u extends Surface {
         allocateData();
         int n = getWidth()*getHeight()*getPixelWidth();
         System.arraycopy(data, 0, mData, 0, n);
+    }
+
+    public Surface8u(Bitmap bitmap) {
+        super(bitmap.getWidth(), bitmap.getHeight(), (4 == (bitmap.getRowBytes()/bitmap.getWidth())) ? Format.RGBA : Format.RGB);
+        allocateData();
+        ByteBuffer bb = ByteBuffer.wrap(mData);
+        bitmap.copyPixelsToBuffer(bb);
     }
 
     public int getBytesPerPixel() {

@@ -2,4 +2,5 @@
     <string name="app_name">Hai Watch Faces</string>
     <string name="face_springmesh">Hai SpringMesh</string>
     <string name="face_fluids2d">Hai Fluids2D</string>
+    <string name="face_simpletexture">Hai SimpleTexture</string>
 </resources>
