@@ -1,20 +1,32 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'cfl-watchfaces'
+            keyPassword 'ch!ll!n'
+            storeFile file('/Users/hai/DevTools/android/signing/cfl-watchfaces.jks')
+            storePassword 'ch!ll!n'
+        }
+    }
     compileSdkVersion 22
     buildToolsVersion "22.0.0"
 
     defaultConfig {
-        applicationId "com.sample.watchfacetest"
+        applicationId "com.codingforlove.wear.watchfaces"
         minSdkVersion 21
         targetSdkVersion 22
-        versionCode 1
+        versionCode 5
         versionName "1.0"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
 }

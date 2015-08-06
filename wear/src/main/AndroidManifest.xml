@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sample.watchfacetest" >
+    package="com.codingforlove.watchfaces" >
 
     <uses-feature android:name="android.hardware.type.watch" />
 
@@ -15,7 +15,7 @@
         android:theme="@android:style/Theme.DeviceDefault" >
 
         <service
-            android:name=".SpringMeshWatchFace"
+            android:name="com.codingforlove.wear.watchfaces.SpringMeshWatchFace"
             android:label="@string/face_springmesh"
             android:permission="android.permission.BIND_WALLPAPER">
             <meta-data
@@ -34,7 +34,7 @@
         </service>
 
         <service
-            android:name=".Fluids2DWatchFace"
+            android:name="com.codingforlove.wear.watchfaces.Fluids2DWatchFace"
             android:label="@string/face_fluids2d"
             android:permission="android.permission.BIND_WALLPAPER">
             <meta-data
@@ -52,8 +52,9 @@
             </intent-filter>
         </service>
 
+        <!--
         <service
-            android:name=".SimpleTextureWatchFace"
+            android:name="com.sample.codingforlove.SimpleTextureWatchFace"
             android:label="@string/face_simpletexture"
             android:permission="android.permission.BIND_WALLPAPER">
             <meta-data
@@ -70,6 +71,7 @@
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
+        -->
 
         <meta-data
             android:name="com.google.android.gms.version"

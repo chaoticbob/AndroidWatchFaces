@@ -202,8 +202,11 @@ public class GlslProg {
      *
      */
     public void uniform(String name, float x) {
-        int location = mUniformLocations.get(name);
-        GLES20.glUniform1f(location, x);
+        Integer value = mUniformLocations.get(name);
+        if(null != value) {
+            int location = value;
+            GLES20.glUniform1f(location, x);
+        }
     }
 
     /** uniform
@@ -227,8 +230,11 @@ public class GlslProg {
      *
      */
     public void uniform(String name, float x, float y, float z) {
-        int location = mUniformLocations.get(name);
-        GLES20.glUniform3f(location, x, y, z);
+        Integer value = mUniformLocations.get(name);
+        if(null != value) {
+            int location = value;
+            GLES20.glUniform3f(location, x, y, z);
+        }
     }
 
     /** uniform
@@ -241,8 +247,11 @@ public class GlslProg {
      *
      */
     public void uniform(String name, float x, float y, float z, float w) {
-        int location = mUniformLocations.get(name);
-        GLES20.glUniform4f(location, x, y, z, w);
+        Integer value = mUniformLocations.get(name);
+        if(null != value) {
+            int location = value;
+            GLES20.glUniform4f(location, x, y, z, w);
+        }
     }
 
     /** uniform
@@ -252,8 +261,11 @@ public class GlslProg {
      *
      */
     public void uniform(String name, mat4 mat) {
-        int location = mUniformLocations.get(name);
-        GLES20.glUniformMatrix4fv(location, 1, false, mat.m, 0);
+        Integer value = mUniformLocations.get(name);
+        if(null != value) {
+            int location = value;
+            GLES20.glUniformMatrix4fv(location, 1, false, mat.m, 0);
+        }
     }
 
     /**
@@ -262,11 +274,14 @@ public class GlslProg {
      *
      */
     public void uniform(String name, Texture tex) {
-        int location = mUniformLocations.get(name);
-        int texUnit = tex.bind();
-        if(-1 != texUnit) {
-            GLES20.glUniform1i(location, texUnit);
-            mBoundTextures.add(tex);
+        Integer value = mUniformLocations.get(name);
+        if(null != value) {
+            int location = value;
+            int texUnit = tex.bind();
+            if( -1 != texUnit) {
+                GLES20.glUniform1i(location, texUnit);
+                mBoundTextures.add(tex);
+            }
         }
     }
 }

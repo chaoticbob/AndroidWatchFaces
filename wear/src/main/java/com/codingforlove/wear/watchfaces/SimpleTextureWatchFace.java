@@ -1,4 +1,4 @@
-package com.sample.watchfacetest;
+package com.codingforlove.wear.watchfaces;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -14,7 +14,6 @@ import android.view.SurfaceHolder;
 import org.hai.gl.GlslProg;
 import org.hai.gl.Texture;
 import org.hai.grfx.Camera;
-import org.hai.grfx.Surface;
 import org.hai.grfx.Surface8u;
 import org.hai.grfx.es2.TriMesh3D;
 

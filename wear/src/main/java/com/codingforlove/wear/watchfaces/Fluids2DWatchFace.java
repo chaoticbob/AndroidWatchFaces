@@ -1,18 +1,13 @@
-package com.sample.watchfacetest;
+package com.codingforlove.wear.watchfaces;
 
-import android.graphics.PixelFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.opengl.GLES20;
-import android.support.v4.view.MotionEventCompat;
 import android.support.wearable.watchface.Gles2WatchFaceService;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.view.View;
-import android.view.WindowManager;
 
 import org.hai.fx.Fluids2D;
 import org.hai.gl.GlslProg;
@@ -58,9 +53,6 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
         private float mPrevOffsetY = 0.0f;
         private float mStrength = 0.0f;
         private Fluids2D.Force[] mForcePoints = new Fluids2D.Force[1];
-
-        private InteractiveTouchView mInteractiveTouchView = null;
-        private float mTouchAreaScreenFraction = 0.25f;
 
         @Override
         public void onCreate(SurfaceHolder holder) {

@@ -28,6 +28,8 @@ public class SpringMesh {
     private float[] accel           = null;
     private float[] response        = null;
 
+    private float[] texCoords       = null;
+
     private GlslProg shader         = null;
     private LineMesh3D lineMesh     = null;
     private PointMesh3D pointMesh   = null;
@@ -47,9 +49,12 @@ public class SpringMesh {
         //
         int n = this.numPointsX*this.numPointsY;
         float[] initialPositions    = new float[3*n];
+        float[] initialTexCoords    = new float[2*n];
         this.prevPos                = new float[3*n];
         this.accel                  = new float[3*n];
         this.response               = new float[n];
+
+        this.texCoords              = new float[2*n];
 
         // Poisitions/accel/response
         float dx = this.bounds.getWidth()/(this.numPointsX - 1);
@@ -82,6 +87,13 @@ public class SpringMesh {
                     response = 0.0f;
                 }
                 this.response[idx] = response;
+
+                float u = (float)i/(float)(this.numPointsX - 1);
+                float v = (float)j/(float)(this.numPointsY - 1);
+                initialTexCoords[2*idx + 0] = u;
+                initialTexCoords[2*idx + 1] = v;
+                this.texCoords[2*idx + 0] = u;
+                this.texCoords[2*idx + 1] = v;
             }
         }
 
@@ -156,10 +168,12 @@ public class SpringMesh {
         this.lineMesh = new LineMesh3D();
         this.lineMesh.bufferIndices(initialIndicesArray);
         this.lineMesh.bufferPositions(initialPositions);
+        this.lineMesh.bufferTexCoords(initialTexCoords);
         this.lineMesh.getPositions().setDynamicDraw();
         //this.lineMesh.update();
         this.pointMesh = new PointMesh3D();
         this.pointMesh.bufferPositions(initialPositions);
+        this.pointMesh.bufferTexCoords(initialTexCoords);
         this.pointMesh.getPositions().setDynamicDraw();
         //this.pointMesh.update();
 
@@ -211,6 +225,14 @@ public class SpringMesh {
         }
 
         Log.i("watchfacetest", "Num springs: " + this.springs.length/2);
+    }
+
+    public float[] getTexCoords() {
+        return this.texCoords;
+    }
+
+    public GlslProg getShader() {
+        return this.shader;
     }
 
     public void setShader(GlslProg shaderProg) {
@@ -338,22 +360,26 @@ public class SpringMesh {
             }
         }
 
-        // Update pointMesh positions
+        // Update lineMesh positions and texCoords
         this.lineMesh.bufferPositions(this.pos);
+        this.lineMesh.bufferTexCoords(this.texCoords);
+        // Update pointMesh positions
         this.pointMesh.bufferPositions(this.pos);
     }
 
     public void draw(Camera cam) {
         this.lineMesh.drawBegin();
         this.lineMesh.getShader().uniform("xform", this.lineMesh.getTransform().getMatrix());
-        this.lineMesh.getShader().uniform("color", 1.0f, 1.0f, 0.0f);
+        //this.lineMesh.getShader().uniform("color", 1.0f, 1.0f, 0.0f);
         this.lineMesh.draw(cam);
         this.lineMesh.drawEnd();
 
+        /*
         this.pointMesh.drawBegin();
         this.pointMesh.getShader().uniform("xform", this.pointMesh.getTransform().getMatrix());
-        this.pointMesh.getShader().uniform("color", 1.0f, 0.0f, 0.0f);
+        //this.pointMesh.getShader().uniform("color", 1.0f, 0.0f, 0.0f);
         this.pointMesh.draw(cam);
         this.pointMesh.drawEnd();
+        */
     }
 }
