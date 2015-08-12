@@ -81,7 +81,7 @@ public class Fluids2D {
 
         this.wrapBoundary = false;
 
-        this.dt = 0.1f;
+        this.dt = 0.025f;
 
         this.velDiss = 0.99999f;
         this.denDiss = 0.99000f;
@@ -113,6 +113,7 @@ public class Fluids2D {
             this.den1[i] = 0.0f;
         }
 
+        /*
         float centerX = 0.5f*this.resX;
         float centerY = 0.5f*this.resY;
         //
@@ -135,9 +136,14 @@ public class Fluids2D {
                 }
             }
         }
+        */
     }
 
-    public float[] getDensity() {
+    public float[] getDensity0() {
+        return this.den0;
+    }
+
+    public float[] getDensity1() {
         return this.den1;
     }
 

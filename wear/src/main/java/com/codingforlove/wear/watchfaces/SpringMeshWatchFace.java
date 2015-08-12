@@ -10,11 +10,13 @@ import android.os.Message;
 import android.support.wearable.watchface.Gles2WatchFaceService;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.WindowInsets;
 
 import org.hai.fx.SpringMesh;
 import org.hai.gl.GlslProg;
 import org.hai.grfx.Camera;
 import org.hai.grfx.Rect;
+import org.hai.grfx.es2.LineMesh3D;
 import org.hai.grfx.es2.TriMesh3D;
 
 import java.util.Calendar;
@@ -24,6 +26,20 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
     private static final String TAG = "SpringMeshWatchFace";
 
     private class MyEngine extends Gles2WatchFaceService.Engine implements SensorEventListener {
+        private static final int ROUND_FACE_OFFSET = -20;
+
+        private static final int TIME_MORNING   = 0;
+        private static final int TIME_AFTERNOON = 1;
+        private static final int TIME_EVENING   = 2;
+        private static final int TIME_NIGHT     = 3;
+        private static final int TIME_TOTAL     = TIME_NIGHT + 1;
+
+        private final int[][] TIME_COLORS = {
+            { 235, 209,  48,  30, 178, 181, },
+            { 254, 214,  50, 238,  78,  54, },
+            { 251,  11,  26, 167, 173, 251, },
+            { 177, 100, 227,  82, 181, 252, },
+        };
 
         private static final int MESH_SIZE_X = 30;
         private static final int MESH_SIZE_Y = 30;
@@ -31,9 +47,15 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
         private SensorManager mSensorMananger = null;
         private float[] mAccel = null;
 
+        private boolean mIsRoundFace = false;
+
         private Camera mCamera = null;
         private SpringMesh mSpringMesh = null;
-        private GlslProg mColorShader = null;
+
+        private GlslProg mGradientShader = null;
+        private GlslProg mAmbientShader = null;
+
+        private LineMesh3D mCrossHatch = null;
 
         private TriMesh3D mRectMesh = null;
 
@@ -55,7 +77,7 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
         private float[] mColor1 = { 1, 1, 1 };
 
         static final int MSG_UPDATE_TIME = 0;
-        static final int INTERACTIVE_UPDATE_RATE_MS = 1000;
+        static final int INTERACTIVE_UPDATE_RATE_MS = 60*1000;
 
         // handler to update the time once a second in interactive mode
         final Handler mUpdateTimeHandler = new Handler() {
@@ -97,8 +119,37 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             }
         }
 
+        void updateColorGradient() {
+            Calendar c = Calendar.getInstance();
+            int hours = c.get(Calendar.HOUR);
+            int minutes = c.get(Calendar.MINUTE);
+            if(Calendar.PM == c.get(Calendar.AM_PM)) {
+                hours += 12;
+            }
+
+            // Start with night
+            int timeIndex = TIME_NIGHT;
+            // Calculate based on time of day
+            if ((hours >= 6) && (hours < 12)) {
+                timeIndex = TIME_MORNING;
+            }
+            else if ((hours >= 12) && (hours < 16)) {
+                timeIndex = TIME_AFTERNOON;
+            }
+            else if ((hours >= 16) && (hours < 20)) {
+                timeIndex = TIME_EVENING;
+            }
+
+            mColor0[0] = TIME_COLORS[timeIndex][0] / 255.0f;
+            mColor0[1] = TIME_COLORS[timeIndex][1] / 255.0f;
+            mColor0[2] = TIME_COLORS[timeIndex][2] / 255.0f;
+            mColor1[0] = TIME_COLORS[timeIndex][3] / 255.0f;
+            mColor1[1] = TIME_COLORS[timeIndex][4] / 255.0f;
+            mColor1[2] = TIME_COLORS[timeIndex][5] / 255.0f;
+        }
+
         private void updateDisplayTime() {
-           //Log.i(TAG, "updateDisplayTime");
+           //Log.d(TAG, "updateDisplayTime");
             if(null == mSpringMesh) {
                 return;
             }
@@ -112,29 +163,47 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             Calendar c = Calendar.getInstance();
             int hours = c.get(Calendar.HOUR);
             int minutes = c.get(Calendar.MINUTE);
-            int seconds = c.get(Calendar.SECOND);
-            //Log.i(TAG, "updateDisplayTime: " + hours + " : " + minutes + " : " + seconds );
 
-            int digit0 = seconds % 10;
-            int digit1 = seconds % 10;
-            int digit2 = seconds / 10;
-            int digit3 = seconds / 10;
+            int digit0 =   hours / 10;
+            int digit1 =   hours % 10;
+            int digit2 = minutes / 10;
+            int digit3 = minutes % 10;
+            if(0 == hours) {
+                digit0 = 1;
+                digit1 = 2;
+            }
 
-            placeNumber( 4,  3, digit0, texCoords);
-            placeNumber(17,  3, digit1, texCoords);
-            placeNumber( 4, 17, digit2, texCoords);
-            placeNumber(17, 17, digit3, texCoords);
+            int y = mIsRoundFace ? 1 : 0;
+
+            if (digit0 > 0) {
+                placeNumber(4, 3 + y, digit0, texCoords);
+            }
+            placeNumber(17,  3 + y, digit1, texCoords);
+            placeNumber( 4, 17 + y, digit2, texCoords);
+            placeNumber(17, 17 + y, digit3, texCoords);
+
+            updateColorGradient();
         }
 
         @Override
         public void onCreate(SurfaceHolder holder) {
-            Log.i(TAG, "onCreate");
+            Log.d(TAG, "onCreate");
             super.onCreate(holder);
         }
 
         @Override
+        public void onApplyWindowInsets(WindowInsets insets) {
+            if(insets.isRound()) {
+                if(null != mSpringMesh) {
+                    mIsRoundFace = true;
+                    mSpringMesh.setOriginOffset(0, ROUND_FACE_OFFSET);
+                }
+            }
+        }
+
+        @Override
         public void onGlContextCreated() {
-            Log.i(TAG, "onGlContextCreated");
+            Log.d(TAG, "onGlContextCreated");
             super.onGlContextCreated();
 
             try {
@@ -156,22 +225,45 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
                     "uniform vec3 color1;" + "\n" +
                     "varying vec2 uv;" + "\n" +
                     "void main() {" + "\n" +
+                    "    float t = floor(uv.x - 1.0) + 1.0;" + "\n" +
                     "    vec3 fc0 = mix(color0, color1, uv.y);" + "\n" +
                     "    vec3 fc1 = vec3(1.0, 1.0, 1.0);" + "\n" +
-                    "    gl_FragColor = vec4(mix(fc0, fc1, uv.x), 1.0);" + "\n" +
+                    "    gl_FragColor = vec4(mix(fc0, fc1, t), 1.0);" + "\n" +
                     "}";
 
-                mColorShader = GlslProg.create(vertShaderSrc, fragShaderSrc);
-                Log.i(TAG, "mColorShader successful");
+                mGradientShader = GlslProg.create(vertShaderSrc, fragShaderSrc);
+                Log.d(TAG, "mGradientShader successful");
             }
             catch(Exception e) {
-                Log.e(TAG, "mColorShader failed: " + e.toString());
+                Log.e(TAG, "mGradientShader failed: " + e.toString());
+            }
+
+            try {
+                String vertShaderSrc =
+                "attribute vec4 vPosition;" + "\n" +
+                "uniform mat4 mvp;" + "\n" +
+                "uniform mat4 xform;" + "\n" +
+                "void main() {" + "\n" +
+                "   gl_Position = mvp*xform*vPosition;" + "\n" +
+                "}";
+
+                String fragShaderSrc =
+                "precision mediump float;" + "\n" +
+                "void main() {" + "\n" +
+                "    gl_FragColor = vec4(1.0);" + "\n" +
+                "}";
+
+                mAmbientShader = GlslProg.create(vertShaderSrc, fragShaderSrc);
+                Log.d(TAG, "mAmbientShader successful");
+            }
+            catch(Exception e) {
+                Log.e(TAG, "mAmbientShader failed: " + e.toString());
             }
         }
 
         @Override
         public void onGlSurfaceCreated(int width, int height) {
-            Log.i(TAG, "onGlSurfaceCreated");
+            Log.d(TAG, "onGlSurfaceCreated: " + width + "x" + height);
             super.onGlSurfaceCreated(width, height);
 
             mScreenWidth = width;
@@ -183,23 +275,27 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             int ny = MESH_SIZE_Y;
             Rect rect = new Rect(0, 0, mScreenWidth, mScreenHeight);
             mSpringMesh = new SpringMesh(nx, ny, rect);
-            mSpringMesh.setShader(mColorShader);
+            mSpringMesh.setShader(mGradientShader);
+
+            mCrossHatch = LineMesh3D.createCrossHatch(0, 0, mSpringMesh.getCellSizeX(), mSpringMesh.getCellSizeY());
+            mCrossHatch.setShader(mAmbientShader);
 
             mRectMesh = TriMesh3D.createRectUL(0, 0, 16, 16);
-            mRectMesh.setShader(mColorShader);
+            mRectMesh.setShader(mGradientShader);
             mRectMesh.getTransform().setOriginOffset(-8.0f, -8.0f, 0.0f);
 
-            mColor0[0] = 254.0f/255.0f;
-            mColor0[1] = 209.0f/255.0f;
-            mColor0[2] = 13.0f/255.0f;
-            mColor1[0] = 254.0f/255.0f;
-            mColor1[1] =  53.0f/255.0f;
-            mColor1[2] =  35.0f/255.0f;
+            updateColorGradient();
         }
 
         @Override
         public void onAmbientModeChanged(boolean inAmbientMode) {
+            Log.d(TAG, "onAmbientModeChanged: " + inAmbientMode);
             super.onAmbientModeChanged(inAmbientMode);
+
+            if( ! inAmbientMode ) {
+                updateTimer();
+            }
+
             invalidate();
         }
 
@@ -215,7 +311,7 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
 
         @Override
         public void onVisibilityChanged(boolean visible) {
-            Log.i(TAG, "onVisibilityChanged:" + visible);
+            Log.d(TAG, "onVisibilityChanged:" + visible);
             super.onVisibilityChanged(visible);
 
             if(visible) {
@@ -233,15 +329,66 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
         @Override
         public void onTimeTick() {
             super.onTimeTick();
+            invalidate();
+        }
+
+        private void placeNumberAmbient(int x, int y, int num) {
+            final float cx = mSpringMesh.getCellSizeX();
+            final float cy = mSpringMesh.getCellSizeY();
+
+            final float yOffset = mIsRoundFace ? ROUND_FACE_OFFSET : 0;
+
+            float[] srcBuf = BlockFontAmbient.sData[num];
+            for(int j = 0; j < BlockFontAmbient.RES_Y; ++j) {
+                for(int i = 0; i < BlockFontAmbient.RES_X; ++i) {
+                    int srcIdx = j*BlockFontAmbient.RES_X + i;
+                    if(srcBuf[srcIdx] > 0) {
+                        float x0 = (x + i)*cx;
+                        float y0 = (y + j)*cy;
+                        mCrossHatch.getTransform().setTranslate(x0, y0 + yOffset, 0.0f);
+                        mCrossHatch.getShader().uniform("xform", mCrossHatch.getTransform().getMatrix());
+                        mCrossHatch.draw(mCamera);
+                    }
+                }
+            }
         }
 
         private void drawAmbient() {
+            Log.d(TAG, "drawAmbient: " + System.currentTimeMillis());
+
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
+
+            Calendar c = Calendar.getInstance();
+            int hours = c.get(Calendar.HOUR);
+            int minutes = c.get(Calendar.MINUTE);
+
+            int digit0 =   hours / 10;
+            int digit1 =   hours % 10;
+            int digit2 = minutes / 10;
+            int digit3 = minutes % 10;
+            if(0 == hours) {
+                digit0 = 1;
+                digit1 = 2;
+            }
+
+            int y = mIsRoundFace ? 1 : 0;
+
+            mCrossHatch.drawBegin();
+
+            if (digit0 > 0) {
+                placeNumberAmbient(4, 4 + y, digit0);
+            }
+            placeNumberAmbient(17,  4 + y, digit1);
+            placeNumberAmbient( 4, 18 + y, digit2);
+            placeNumberAmbient(17, 18 + y, digit3);
+
+            mCrossHatch.drawEnd();
         }
 
         private void draw() {
+
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -256,16 +403,20 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             mSpringMesh.getShader().uniform("color1", mColor1[0], mColor1[1], mColor1[2]);
             mSpringMesh.draw(this.mCamera);
 
+            // Move the force point around
             float a = 0.08f;
             mOffsetX += a*(mOffsetTargetX - mOffsetX);
             mOffsetY += a*(mOffsetTargetY - mOffsetY);
-            mRectMesh.getTransform().setTranslate(mScreenWidth/2.0f + mOffsetX, mScreenHeight/2.0f + mOffsetY, 0.0f);
 
-//            mRectMesh.drawBegin();
-//            mRectMesh.getShader().uniform("xform", mRectMesh.getTransform().getMatrix());
-//            mRectMesh.getShader().uniform("color", 0.0f, 0.0f, 1.0f);
-//            mRectMesh.draw(this.mCamera);
-//            mRectMesh.drawEnd();
+            //
+            // Save for Debug
+            //
+            //mRectMesh.getTransform().setTranslate(mScreenWidth/2.0f + mOffsetX, mScreenHeight/2.0f + mOffsetY, 0.0f);
+            //mRectMesh.drawBegin();
+            //mRectMesh.getShader().uniform("xform", mRectMesh.getTransform().getMatrix());
+            //mRectMesh.getShader().uniform("color", 0.0f, 0.0f, 1.0f);
+            //mRectMesh.draw(this.mCamera);
+            //mRectMesh.drawEnd();
         }
 
         @Override
@@ -341,4 +492,5 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
     public Engine onCreateEngine() {
         return new MyEngine();
     }
+
 }

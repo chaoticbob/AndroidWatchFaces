@@ -21,6 +21,9 @@ public class SpringMesh {
     private int numPointsX          = 0;
     private int numPointsY          = 0;
 
+    private float cellSizeX         = 0;
+    private float cellSizeY         = 0;
+
     private int[] springs           = null;
     private float[] springLengths   = null;
     private float[] pos             = null;
@@ -60,6 +63,10 @@ public class SpringMesh {
         float dx = this.bounds.getWidth()/(this.numPointsX - 1);
         float dy = this.bounds.getHeight()/(this.numPointsY - 1);
         Log.i("watchfacetest", "dx: " + dx + ", dy: " + dy);
+
+        this.cellSizeX = dx;
+        this.cellSizeY = dy;
+
         for( int j = 0; j < this.numPointsY; ++j ) {
             for( int i = 0; i < this.numPointsX; ++i ) {
                 int idx  = j*this.numPointsX + i;
@@ -225,6 +232,18 @@ public class SpringMesh {
         }
 
         Log.i("watchfacetest", "Num springs: " + this.springs.length/2);
+    }
+
+    public float getCellSizeX() {
+        return this.cellSizeX;
+    }
+
+    public float getCellSizeY() {
+        return this.cellSizeY;
+    }
+
+    public void setOriginOffset(float x, float y) {
+        this.lineMesh.getTransform().setOriginOffset(x, y, 0.0f);
     }
 
     public float[] getTexCoords() {

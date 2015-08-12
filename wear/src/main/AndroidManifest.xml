@@ -33,6 +33,7 @@
             </intent-filter>
         </service>
 
+        <!--
         <service
             android:name="com.codingforlove.wear.watchfaces.Fluids2DWatchFace"
             android:label="@string/face_fluids2d"
@@ -51,6 +52,7 @@
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
+        -->
 
         <!--
         <service
