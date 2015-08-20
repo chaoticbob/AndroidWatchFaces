@@ -5,8 +5,8 @@ A conversation with someone got me curious about using OpenGL for Android Wear w
 The OpenGL is ported from some existing WebGL code. JavaScript to Java?! I know right. Still in the process of filling it out. It's done enough right now to support the required functions on the watchfaces. 
 
 ### Watch Faces
-##### SpringMesh
-Spring mesh simulation. Responds to accelorometer. Looks similar to the screenshot below. Will get real screenshot soon. 
+##### Time Mesh
+Spring mesh simulation. Responds to accelorometer. 
 
 ![alt tag](https://raw.githubusercontent.com/chaoticbob/AndroidWatchFaces/master/images/springs.png)
 
