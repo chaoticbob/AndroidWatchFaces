@@ -13,7 +13,7 @@ android {
     compileSdkVersion 22
     buildToolsVersion "22.0.0"
     defaultConfig {
-        applicationId "com.codingforlove.wear.watchfaces"
+        applicationId "com.codingforlove.wear.watchfacesfl2d"
         minSdkVersion 21
         targetSdkVersion 22
         versionCode 9
@@ -28,6 +28,11 @@ android {
         debug {
             signingConfig signingConfigs.config
         }
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/java'
+        main.java.srcDirs += '../../Common/wear/src/java'
     }
 }
 

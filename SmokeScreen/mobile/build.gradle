@@ -13,7 +13,7 @@ android {
     buildToolsVersion "22.0.0"
 
     defaultConfig {
-        applicationId "com.codingforlove.wear.watchfaces"
+        applicationId "com.codingforlove.wear.watchfacesfl2d"
         minSdkVersion 21
         targetSdkVersion 22
         versionCode 9

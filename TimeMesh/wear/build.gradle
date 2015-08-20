@@ -29,6 +29,11 @@ android {
             signingConfig signingConfigs.config
         }
     }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/java'
+        main.java.srcDirs += '../../Common/wear/src/java'
+    }
 }
 
 dependencies {
