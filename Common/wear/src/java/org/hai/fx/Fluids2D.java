@@ -53,7 +53,7 @@ public class Fluids2D {
     private float velVisc           = 0.1f;
     private float denVisc           = 0.1f;
 
-    private float vorticityScale    = 0.25f;
+    private float vorticityScale    = 0.20f;
 
     public Fluids2D(int nx, int ny, Rect bounds) {
         this.resX = nx;

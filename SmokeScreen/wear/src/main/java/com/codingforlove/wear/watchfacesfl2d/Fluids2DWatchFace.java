@@ -368,8 +368,8 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
                 mForcePoints[0].y = (float)y1/(float)FLUIDS_RES_Y;
 
                 float scale = 1.0f;
-                mFluids2D.splatDensity(mForcePoints, 0.2f*scale);
-                mFluids2D.splatVelocity(mForcePoints, 0.048f*scale);
+                mFluids2D.splatDensity(mForcePoints, 0.26f*scale);
+                mFluids2D.splatVelocity(mForcePoints, 0.2f*scale);
 
                 numerator += shortest;
                 if (!(numerator<longest)) {
@@ -386,8 +386,12 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
         private void placeNumber(int x, int y, Digit digit, float t) {
             float[][] data = StrokeFont.getNumber( digit.value );
 
-            float seg_dt = 1.0f/(float)data.length;
+            float seg_dt = 1.0f/(float)(data.length);
             int i = (int)Math.floor(t/seg_dt);
+            if( i >= data.length ) {
+                return;
+            }
+
             float x0 = data[i][0]*FONT_WIDTH;
             float y0 = data[i][1]*FONT_HEIGHT;
             float x1 = data[i][2]*FONT_WIDTH;
@@ -433,10 +437,11 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             //mStrength = 1.0f;
 
             if(mStartTime > 0) {
-                double span = 2.0;
+                double span = 1.5;
                 double elapsed = (double)(System.nanoTime() - mStartTime)/1000000000.0;
-                if( elapsed <= span ) {
-                    float t = (float)(elapsed/span);
+                float t = (float)(elapsed/span);
+                if( t <= 1.25f ) {
+                    t = Math.min( t, 1.0f );
                     int x = -(int)(1.5f*FONT_WIDTH/2.0f);
                     int y = (int)(FLUIDS_RES_Y - FONT_HEIGHT)/2;
                     if(mDigits[DIGIT_0].value > 0) {
@@ -446,6 +451,8 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
                     placeNumber(x + 28, y, mDigits[DIGIT_1], t);
                     placeNumber(x + 59, y, mDigits[DIGIT_2], t);
                     placeNumber(x + 82, y, mDigits[DIGIT_3], t);
+
+                    Log.i(TAG, "t: "+ t );
                 }
             }
 

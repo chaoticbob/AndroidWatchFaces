@@ -6,7 +6,8 @@ android {
         config {
             keyAlias 'cfl-watchfaces'
             keyPassword 'ch!ll!n'
-            storeFile file('/Users/hai/DevTools/android/signing/cfl-watchfaces.jks')
+            storeFile file('${project.projectDir}/../../../signing/cfl-watchfaces.jks')
+            println project.projectDir
             storePassword 'ch!ll!n'
         }
     }
