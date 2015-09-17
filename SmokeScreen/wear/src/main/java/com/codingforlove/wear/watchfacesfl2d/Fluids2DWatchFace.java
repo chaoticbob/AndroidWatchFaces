@@ -27,7 +27,6 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
 
     private static final String TAG = "Fluids2DWatchFace";
 
-    //private class MyEngine extends Gles2WatchFaceService.Engine implements SensorEventListener, View.OnTouchListener {
     private class MyEngine extends Gles2WatchFaceService.Engine implements SensorEventListener {
 
         private static final int FLUIDS_RES_X = 100;
@@ -74,9 +73,6 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             public int stepCount = 0;
         };
 
-        //private float[] mPrevPos = { 0, 0 };
-        //private int mStepCount = 0;
-
         static final int DIGIT_0 = 0;
         static final int DIGIT_1 = 1;
         static final int DIGIT_2 = 2;
@@ -84,13 +80,8 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
 
         private Digit[] mDigits = null;
 
-//        private int mDigit0 = 0;
-//        private int mDigit1 = 0;
-//        private int mDigit2 = 0;
-//        private int mDigit3 = 0;
-
         static final int MSG_UPDATE_TIME = 0;
-        static final int INTERACTIVE_UPDATE_RATE_MS = 10*1000;
+        static final int INTERACTIVE_UPDATE_RATE_MS = 9*1000;
 
         // handler to update the time once a second in interactive mode
         final Handler mUpdateTimeHandler = new Handler() {
@@ -265,57 +256,6 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             mSensorMananger.unregisterListener(this);
         }
 
-        /*
-        private void setupTouch() {
-            if(mInteractiveTouchView != null) {
-                return;
-            }
-
-            mInteractiveTouchView = new InteractiveTouchView(getApplicationContext());
-            mInteractiveTouchView.setOnTouchListener(this);
-            WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                    (int)(mScreenWidth * mTouchAreaScreenFraction),
-                    (int)(mScreenHeight * mTouchAreaScreenFraction),
-                    WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                    PixelFormat.TRANSLUCENT);
-
-            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-            wm.addView(mInteractiveTouchView, params);
-        }
-
-        private void teardownTouch() {
-            if(mInteractiveTouchView == null) {
-                return; // Nothing to remove
-            }
-
-            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-            wm.removeView(mInteractiveTouchView);
-            mInteractiveTouchView = null;
-        }
-
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            int action = MotionEventCompat.getActionMasked(event);
-            switch(action) {
-                case (MotionEvent.ACTION_DOWN) :
-                    updatePositions(event);
-                case (MotionEvent.ACTION_MOVE) :
-                    updatePositions(event);
-                case (MotionEvent.ACTION_UP) :
-                    updatePositions(event);
-                default :
-                    break;
-            }
-            return true;
-        }
-
-        private void updatePositions(MotionEvent event) {
-            mOffsetX = event.getRawX();
-            mOffsetY = event.getRawY();
-        }
-        */
-
         @Override
         public void onVisibilityChanged(boolean visible) {
             Log.i(TAG, "onVisibilityChanged:" + visible);
@@ -323,12 +263,10 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
 
             if(visible) {
                 registerSensor();
-                //setupTouch();
                 invalidate();
             }
             else {
                 unregisterSensor();
-                //teardownTouch();
                 mHasSample = false;
             }
 
@@ -396,6 +334,13 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             float y0 = data[i][1]*FONT_HEIGHT;
             float x1 = data[i][2]*FONT_WIDTH;
             float y1 = data[i][3]*FONT_HEIGHT;
+
+            //  This is a stroke reset
+            if((x0 < 0.0f) && (y0 < 0.0f) && (x1 < 0.0f) && (y1 < 0.0f)) {
+                digit.stepCount = 0;
+                return;
+            }
+
             float dx = (x1 - x0);
             float dy = (y1 - y0);
 
@@ -403,10 +348,6 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
             float fx = (x0 + s*dx) + x;
             float fy = (y0 + s*dy) + y;
 
-//            mForcePoints[0].x = fx/(float)FLUIDS_RES_X;
-//            mForcePoints[0].y = fy/(float)FLUIDS_RES_Y;
-//            mForcePoints[0].dx = 0.0f;
-//            mForcePoints[0].dy = 0.0f;
             if(digit.stepCount > 0) {
                 mForcePoints[0].dx = (fx - digit.prevX)/(float)FLUIDS_RES_X;
                 mForcePoints[0].dy = (fy - digit.prevY)/(float)FLUIDS_RES_Y;
@@ -416,13 +357,8 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
                 int lx2 = (int)(fx + 0.5f);
                 int ly2 = (int)(fy + 0.5f);
 
-                //Log.i(TAG, "(" + lx1 + ", " + ly1 + ") -> (" + lx2 + ", " + ly2 + ")");
-
                 line(lx1, ly1, lx2, ly2);
             }
-
-            //mFluids2D.splatDensity(mForcePoints, 0.27f);
-            //mFluids2D.splatVelocity(mForcePoints, 0.0072f);
 
             digit.prevX = fx;
             digit.prevY = fy;
@@ -432,9 +368,6 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
         private void draw() {
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-
-            //float currentTouchStrength = getTouchStrength();
-            //mStrength = 1.0f;
 
             if(mStartTime > 0) {
                 double span = 1.5;
@@ -451,20 +384,10 @@ public class Fluids2DWatchFace extends Gles2WatchFaceService{
                     placeNumber(x + 28, y, mDigits[DIGIT_1], t);
                     placeNumber(x + 59, y, mDigits[DIGIT_2], t);
                     placeNumber(x + 82, y, mDigits[DIGIT_3], t);
-
-                    Log.i(TAG, "t: "+ t );
                 }
             }
 
             if(mStrength > 0.1f) {
-                /*
-                mForcePoints[0].x = mOffsetX / (float)mScreenWidth;
-                mForcePoints[0].y = mOffsetY / (float)mScreenHeight;
-                mForcePoints[0].dx = (mOffsetX - mPrevOffsetX) / (float)mScreenWidth * mStrength;
-                mForcePoints[0].dy = (mOffsetY - mPrevOffsetY) / (float)mScreenHeight * mStrength;
-                mFluids2D.splatDensity(mForcePoints, mStrength);
-                mFluids2D.splatVelocity(mForcePoints, mStrength);
-                */
                 mForcePoints[0].x = (mScreenWidth / 2.0f + mOffsetX) / (float)mScreenWidth;
                 mForcePoints[0].y = (mScreenHeight / 2.0f + mOffsetY) / (float)mScreenHeight;
                 mForcePoints[0].dx = (mOffsetX - mPrevOffsetX) / (float)mScreenWidth * mStrength;
