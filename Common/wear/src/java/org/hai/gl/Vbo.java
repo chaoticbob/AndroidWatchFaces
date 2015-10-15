@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 public class Vbo {
     private int mVboId = 0;
@@ -173,21 +174,33 @@ public class Vbo {
 
     /** bufferData
      *
-     * @param data Integer data
+     * @param data Integer data. Automatically converts to short if platform doesn't support 32 bit indices.
      *
      */
     public void bufferData(int[] data) {
-        int dataSizeInBytes = 4*data.length;
+        int indexSize = org.hai.gl.Env.supportsIndexElementUInt() ? 4 : 2;
+        int dataSizeInBytes = indexSize*data.length;
+
+        GLES20.glBindBuffer(mTarget, mVboId);
 
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(dataSizeInBytes);
         byteBuffer.order(ByteOrder.nativeOrder());
 
-        IntBuffer buffer = byteBuffer.asIntBuffer();
-        buffer.put(data);
-        buffer.position(0);
+        if(4 == indexSize) {
+            IntBuffer buffer = byteBuffer.asIntBuffer();
+            buffer.put(data);
+            buffer.position(0);
+            GLES20.glBufferData(mTarget, dataSizeInBytes, buffer, mAttribUsage);
+        }
+        else if(2 == indexSize) {
+            ShortBuffer buffer = byteBuffer.asShortBuffer();
+            for(int val : data ) {
+                buffer.put((short)val);
+            }
+            buffer.position(0);
+            GLES20.glBufferData(mTarget, dataSizeInBytes, buffer, mAttribUsage);
+        }
 
-        GLES20.glBindBuffer(mTarget, mVboId);
-        GLES20.glBufferData(mTarget, dataSizeInBytes, buffer, mAttribUsage);
         GLES20.glBindBuffer(mTarget, 0);
     }
 
@@ -217,16 +230,26 @@ public class Vbo {
      *
      */
     public void bufferSubData(int[] data) {
-        int dataSizeInBytes = 4*data.length;
+        int indexSize = org.hai.gl.Env.supportsIndexElementUInt() ? 4 : 2;
+        int dataSizeInBytes = indexSize*data.length;
 
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(dataSizeInBytes);
         byteBuffer.order(ByteOrder.nativeOrder());
 
-        IntBuffer buffer = byteBuffer.asIntBuffer();
-        buffer.put(data);
-        buffer.position(0);
-
-        GLES20.glBufferSubData(mTarget, 0, dataSizeInBytes, buffer);
+        if(4 == indexSize) {
+            IntBuffer buffer = byteBuffer.asIntBuffer();
+            buffer.put(data);
+            buffer.position(0);
+            GLES20.glBufferSubData(mTarget, 0, dataSizeInBytes, buffer);
+        }
+        else if(2 == indexSize) {
+            ShortBuffer buffer = byteBuffer.asShortBuffer();
+            for(int val : data ) {
+                buffer.put((short)val);
+            }
+            buffer.position(0);
+            GLES20.glBufferSubData(mTarget, 0, dataSizeInBytes, buffer);
+        }
     }
 
     /** bufferSubData

@@ -8,7 +8,9 @@ import android.opengl.GLES20;
 import android.os.Handler;
 import android.os.Message;
 import android.support.wearable.watchface.Gles2WatchFaceService;
+import android.support.wearable.watchface.WatchFaceStyle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
@@ -173,7 +175,7 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
                 digit1 = 2;
             }
 
-            int y = mIsRoundFace ? 1 : 0;
+            int y = (mIsRoundFace && (320 != mScreenHeight)) ? 1 : 0;
 
             if (digit0 > 0) {
                 placeNumber(4, 3 + y, digit0, texCoords);
@@ -189,6 +191,14 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
         public void onCreate(SurfaceHolder holder) {
             Log.d(TAG, "onCreate");
             super.onCreate(holder);
+
+            setWatchFaceStyle(new WatchFaceStyle.Builder(SpringMeshWatchFace.this)
+                .setCardPeekMode(WatchFaceStyle.PEEK_MODE_SHORT)
+                .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
+                .setStatusBarGravity(Gravity.RIGHT | Gravity.TOP)
+                .setHotwordIndicatorGravity(Gravity.LEFT | Gravity.TOP)
+                .setShowSystemUiTime(false)
+                .build());
         }
 
         @Override
@@ -196,7 +206,9 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             if(insets.isRound()) {
                 if(null != mSpringMesh) {
                     mIsRoundFace = true;
-                    mSpringMesh.setOriginOffset(0, ROUND_FACE_OFFSET);
+                    if( 320 != mScreenHeight ) {
+                        mSpringMesh.setOriginOffset(0, ROUND_FACE_OFFSET);
+                    }
                 }
             }
         }
@@ -336,7 +348,7 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             final float cx = mSpringMesh.getCellSizeX();
             final float cy = mSpringMesh.getCellSizeY();
 
-            final float yOffset = mIsRoundFace ? ROUND_FACE_OFFSET : 0;
+            final float yOffset = (mIsRoundFace && (320 != mScreenHeight)) ? ROUND_FACE_OFFSET : 0;
 
             float[] srcBuf = BlockFontAmbient.sData[num];
             for(int j = 0; j < BlockFontAmbient.RES_Y; ++j) {
@@ -373,7 +385,7 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
                 digit1 = 2;
             }
 
-            int y = mIsRoundFace ? 1 : 0;
+            int y = (mIsRoundFace && (320 != mScreenHeight)) ? 1 : 0;
 
             mCrossHatch.drawBegin();
 

@@ -15,7 +15,8 @@ public class LineMesh3D extends Mesh3D {
         getShader().uniform("mvp", cam.getModelViewProjectionMatrix());
         if(hasIndices()) {
             int count = getNumActiveVertices();
-            GLES20.glDrawElements(GLES20.GL_LINES, count, GLES20.GL_UNSIGNED_INT, 0);
+            int type = org.hai.gl.Env.supportsIndexElementUInt() ? GLES20.GL_UNSIGNED_INT : GLES20.GL_UNSIGNED_SHORT;
+            GLES20.glDrawElements(GLES20.GL_LINES, count, type, 0);
         }
         else {
             int count = getNumActiveVertices();

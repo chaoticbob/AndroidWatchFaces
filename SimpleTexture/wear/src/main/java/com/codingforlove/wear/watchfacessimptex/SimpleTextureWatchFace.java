@@ -45,6 +45,8 @@ public class SimpleTextureWatchFace  extends Gles2WatchFaceService {
             Log.i(TAG, "onGlContextCreated");
             super.onGlContextCreated();
 
+            org.hai.gl.Env.initialize();
+
             try {
                 String vertShaderSrc =
                     "attribute vec4 vPosition;" + "\n" +
