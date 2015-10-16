@@ -218,6 +218,8 @@ public class SpringMeshWatchFace extends Gles2WatchFaceService {
             Log.d(TAG, "onGlContextCreated");
             super.onGlContextCreated();
 
+            org.hai.gl.Env.initialize();
+
             try {
                 String vertShaderSrc =
                     "attribute vec4 vPosition;" + "\n" +
